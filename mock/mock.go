@@ -3,8 +3,6 @@ package clever
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ant0ine/go-urlrouter"
-	"golang.org/x/oauth2"
 	"io"
 	"log"
 	"net/http"
@@ -12,6 +10,9 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+
+	"github.com/ant0ine/go-urlrouter"
+	"golang.org/x/oauth2"
 )
 
 // PostHandler is a function that handles POST requests.
@@ -96,6 +97,10 @@ func NewMock(postHandler PostHandler, dir string, lastRequestHeader ...*map[stri
 			urlrouter.Route{
 				PathExp: "/mock/rate/limiter",
 				Dest:    MockResourceRateLimit(),
+			},
+			urlrouter.Route{
+				PathExp: "/mock/error_html",
+				Dest:    MockErrorAsHtml(),
 			},
 			urlrouter.Route{
 				PathExp: "/mock/error",
@@ -215,5 +220,12 @@ func MockResourceRateLimit() func(http.ResponseWriter, *http.Request, map[string
 func MockError() func(http.ResponseWriter, *http.Request, map[string]string) {
 	return func(w http.ResponseWriter, req *http.Request, params map[string]string) {
 		http.Error(w, `{"code":1337,"error":"there was an error"}`, 500)
+	}
+}
+
+// MockErrorAsHtml return a mock error response enclosed in html markup
+func MockErrorAsHtml() func(http.ResponseWriter, *http.Request, map[string]string) {
+	return func(w http.ResponseWriter, req *http.Request, params map[string]string) {
+		http.Error(w, `<html><head></head><body><h1>code: 1337</h1><p>there was an error</p></body></html>`, 500)
 	}
 }

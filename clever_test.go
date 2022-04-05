@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	mock "github.com/Clever/clever-go/mock"
+	mock "github.com/sully-scoir/clever-go/mock"
 )
 
 func TestQueryDistricts(t *testing.T) {
@@ -464,8 +464,19 @@ func TestHandlesErrors(t *testing.T) {
 	result := clever.QueryAll("/mock/error", nil)
 	result.Next()
 	if result.Error() == nil {
-		t.Fatalf("error endpoint did not trigger an error as expected")
+		t.Fatalf("mock error endpoint did not trigger an error as expected")
 	} else if result.Error().Error() != "there was an error (1337)" {
-		t.Fatalf("error endpoint did not generate the expected error: %s", result.Error().Error())
+		t.Fatalf("mock error endpoint did not generate the expected error: %s", result.Error().Error())
+	}
+}
+
+func TestHandleErrorsAsHtml(t *testing.T) {
+	clever := New(mock.NewMock(nil, "./data"))
+	result := clever.QueryAll("/mock/error_html", nil)
+	result.Next()
+	if result.Error() == nil {
+		t.Fatalf("mock error endpiont did not trigger an error as expected")
+	} else if result.Error().Error() != "there was an error (1337)" {
+		t.Fatalf("mock error endpoint did not generate the expected error, actual error: %s", result.Error().Error())
 	}
 }
