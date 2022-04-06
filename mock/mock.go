@@ -18,6 +18,8 @@ import (
 // PostHandler is a function that handles POST requests.
 type PostHandler func(*http.Request, map[string]string) error
 
+var ErrorAsHtml string = `<html><head></head><body><h1>code: 1337</h1><p>there was an error</p></body></html>`
+
 // NewMock loads a directory with json files representing mock resources. See ./data for an example
 func NewMock(postHandler PostHandler, dir string, lastRequestHeader ...*map[string][]string) (*http.Client, string) {
 	router := urlrouter.Router{

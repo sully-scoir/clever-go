@@ -476,7 +476,7 @@ func TestHandleErrorsAsHtml(t *testing.T) {
 	result.Next()
 	if result.Error() == nil {
 		t.Fatalf("mock error endpiont did not trigger an error as expected")
-	} else if result.Error().Error() != "there was an error (1337)" {
+	} else if result.Error().Error() != mock.ErrorAsHtml {
 		t.Fatalf("mock error endpoint did not generate the expected error, actual error: %s", result.Error().Error())
 	}
 }
