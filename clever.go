@@ -11,7 +11,6 @@ import (
 	"net/url"
 	"os/exec"
 	"runtime"
-	"strings"
 )
 
 const debug = false
@@ -366,21 +365,28 @@ func (clever *Clever) Request(method string, path string, params url.Values, bod
 		return &TooManyRequestsError{r.Header}
 	} else if r.StatusCode != 200 {
 		error := CleverError{}
-		builder := new(strings.Builder)
-		_, err := io.Copy(builder, r.Body)
+		bodyBytes, err := convertReaderToBytes(r.Body)
 		if err != nil {
 			return err
 		}
-		strBody := builder.String()
-		if strings.HasPrefix(strBody, "<") {
-			error.Message = strBody
-		} else if err := json.Unmarshal([]byte(strBody), &error); err != nil {
+		if bodyBytes[0] == '<' {
+			error.Message = string(bodyBytes)
+		} else if err := json.Unmarshal(bodyBytes, &error); err != nil {
 			return err
 		}
 		return &error
 	}
 	err = json.NewDecoder(r.Body).Decode(resp)
 	return err
+}
+
+func convertReaderToBytes(r io.Reader) ([]byte, error) {
+	builder := new(bytes.Buffer)
+	_, err := io.Copy(builder, r)
+	if err != nil {
+		return nil, err
+	}
+	return builder.Bytes(), nil
 }
 
 // PagedResult wraps a response. It allows for paged reading of a response in conjunction with QueryAll() and Next()
