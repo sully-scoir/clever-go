@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"os/exec"
 	"runtime"
+	"strings"
 )
 
 const debug = false
@@ -364,8 +365,16 @@ func (clever *Clever) Request(method string, path string, params url.Values, bod
 	if r.StatusCode == 429 {
 		return &TooManyRequestsError{r.Header}
 	} else if r.StatusCode != 200 {
-		var error CleverError
-		if err := json.NewDecoder(r.Body).Decode(&error); err != nil {
+		error := CleverError{}
+		builder := new(strings.Builder)
+		_, err := io.Copy(builder, r.Body)
+		if err != nil {
+			return err
+		}
+		strBody := builder.String()
+		if strings.HasPrefix(strBody, "<") {
+			error.Message = strBody
+		} else if err := json.Unmarshal([]byte(strBody), &error); err != nil {
 			return err
 		}
 		return &error
