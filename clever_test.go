@@ -481,14 +481,3 @@ func TestHandleErrorsAsHtml(t *testing.T) {
 		t.Fatalf("mock error endpoint did not generate the expected error, actual error: %s", result.Error().Error())
 	}
 }
-
-// func TestHandleResponseAsHtml(t *testing.T) {
-// 	clever := New(mock.NewMock(nil, "./data"))
-// 	result := clever.QueryAll("/mock/html", nil)
-// 	result.Next()
-// 	if result.Error() == nil {
-// 		t.Fatalf("mock error endpiont did not trigger an error as expected")
-// 	} else if result.Error().Error() != mock.ErrorAsHtml {
-// 		t.Fatalf("mock error endpoint did not generate the expected error, actual error: %s", result.Error().Error())
-// 	}
-// }
